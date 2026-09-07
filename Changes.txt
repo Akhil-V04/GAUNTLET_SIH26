@@ -1,0 +1,8 @@
+- after login dashboard page - Fix location error the latitude longitude is not feasible for uneducated users so only use use current location as input(the current current location is not giving right location)
+
+- dashboard page- map issues button should only be in admin button and again the location is not precise, and zoom in zoom out option is not available in the map
+In the user panel the reports should not be related to admin reports it should only have issues files, issues reject, active, also no file button to upload jpg,jpeg,png files to the admin
+
+- login page for user changes: full name, email,ph no, password, retype password and an eye icon the check the password not in hashed format to view
+for officer login: the admin@gmail.com login page is ok but admin account must be already present rather than signup 
+for solver(university): for this the signup must have different set of inputs to create account right? like: College Name, Coordinator name, location, Field(cs,mechanical,civil,electrical,all), password, retype password.

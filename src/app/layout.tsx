@@ -3,8 +3,8 @@ import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Gauntlet | Every report deserves a resolution",
-  description: "Report neighbourhood issues, connect the history, and track action through verified resolution. Built by Team Gauntlet.",
+  title: "Gauntlet | Real challenges, meaningful contributions",
+  description: "Connect societal problems with accountable organisations and student teams. Built by Team Gauntlet.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

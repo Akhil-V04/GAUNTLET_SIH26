@@ -46,7 +46,7 @@ export function AuthForm() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/workspace");
     router.refresh();
   }
 
@@ -60,7 +60,7 @@ export function AuthForm() {
         {mode === "signup" && <label>Full name<input name="fullName" autoComplete="name" minLength={2} maxLength={100} required /></label>}
         <label>Email<input name="email" type="email" autoComplete="email" required /></label>
         <label>Password<input name="password" type="password" autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={8} required /></label>
-        <button className="button-primary auth-submit" disabled={pending}>{pending ? "Please wait…" : mode === "login" ? "Sign in" : "Create citizen account"}<span aria-hidden="true">↗</span></button>
+        <button className="button-primary auth-submit" disabled={pending}>{pending ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}<span aria-hidden="true">↗</span></button>
         <p className="form-message" role="status">{message}</p>
       </form>
     </>

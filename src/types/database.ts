@@ -66,6 +66,763 @@ export type Database = {
           },
         ]
       }
+      collab_activity: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          entity_id: string
+          entity_type: string
+          id: number
+          visibility: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id: string
+          entity_type: string
+          id?: never
+          visibility?: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          entity_id?: string
+          entity_type?: string
+          id?: never
+          visibility?: string
+        }
+        Relationships: []
+      }
+      collab_applications: {
+        Row: {
+          challenge_id: string
+          id: string
+          limitations: string
+          portfolio_url: string | null
+          proposal: string
+          relevant_experience: string
+          responsibility_plan: string
+          review_note: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          revision: number
+          roster_snapshot: string[]
+          status: string
+          submitted_at: string
+          submitted_by: string
+          team_id: string
+        }
+        Insert: {
+          challenge_id: string
+          id?: string
+          limitations: string
+          portfolio_url?: string | null
+          proposal: string
+          relevant_experience?: string
+          responsibility_plan?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision?: number
+          roster_snapshot?: string[]
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          team_id: string
+        }
+        Update: {
+          challenge_id?: string
+          id?: string
+          limitations?: string
+          portfolio_url?: string | null
+          proposal?: string
+          relevant_experience?: string
+          responsibility_plan?: string
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          revision?: number
+          roster_snapshot?: string[]
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_applications_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_applications_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "collab_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_challenges: {
+        Row: {
+          application_deadline: string | null
+          application_mode: string
+          constraints: string
+          created_at: string
+          deliverables: string
+          engagement_type: string
+          evaluation_criteria: string
+          expected_roles: string[]
+          id: string
+          maximum_applications: number | null
+          maximum_interests: number | null
+          maximum_team_size: number
+          minimum_team_size: number
+          objective: string
+          organization_id: string
+          owner_id: string
+          problem_id: string
+          status: string
+          submission_limit: number
+          support_offered: string
+          timezone: string
+          title: string
+          updated_at: string
+          useful_skills: string[]
+        }
+        Insert: {
+          application_deadline?: string | null
+          application_mode?: string
+          constraints?: string
+          created_at?: string
+          deliverables: string
+          engagement_type?: string
+          evaluation_criteria?: string
+          expected_roles?: string[]
+          id?: string
+          maximum_applications?: number | null
+          maximum_interests?: number | null
+          maximum_team_size?: number
+          minimum_team_size?: number
+          objective: string
+          organization_id: string
+          owner_id: string
+          problem_id: string
+          status?: string
+          submission_limit?: number
+          support_offered?: string
+          timezone?: string
+          title: string
+          updated_at?: string
+          useful_skills?: string[]
+        }
+        Update: {
+          application_deadline?: string | null
+          application_mode?: string
+          constraints?: string
+          created_at?: string
+          deliverables?: string
+          engagement_type?: string
+          evaluation_criteria?: string
+          expected_roles?: string[]
+          id?: string
+          maximum_applications?: number | null
+          maximum_interests?: number | null
+          maximum_team_size?: number
+          minimum_team_size?: number
+          objective?: string
+          organization_id?: string
+          owner_id?: string
+          problem_id?: string
+          status?: string
+          submission_limit?: number
+          support_offered?: string
+          timezone?: string
+          title?: string
+          updated_at?: string
+          useful_skills?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_challenges_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "collab_organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_challenges_problem_id_fkey"
+            columns: ["problem_id"]
+            isOneToOne: true
+            referencedRelation: "collab_problems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_contributions: {
+        Row: {
+          challenge_id: string
+          id: string
+          limitations: string
+          milestone_id: string
+          output_url: string | null
+          review_note: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          submitted_by: string
+          summary: string
+          team_id: string
+        }
+        Insert: {
+          challenge_id: string
+          id?: string
+          limitations?: string
+          milestone_id: string
+          output_url?: string | null
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by: string
+          summary: string
+          team_id: string
+        }
+        Update: {
+          challenge_id?: string
+          id?: string
+          limitations?: string
+          milestone_id?: string
+          output_url?: string | null
+          review_note?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          submitted_by?: string
+          summary?: string
+          team_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_contributions_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_contributions_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "collab_milestones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_contributions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "collab_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_interests: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          is_visible: boolean
+          note: string
+          student_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          is_visible?: boolean
+          note?: string
+          student_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          is_visible?: boolean
+          note?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_interests_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_milestones: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          description: string
+          due_at: string | null
+          id: string
+          points: number
+          sequence_number: number
+          title: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          points?: number
+          sequence_number: number
+          title: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          description?: string
+          due_at?: string | null
+          id?: string
+          points?: number
+          sequence_number?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_milestones_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_organization_memberships: {
+        Row: {
+          created_at: string
+          membership_role: string
+          membership_status: string
+          organization_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          membership_role: string
+          membership_status?: string
+          organization_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          membership_role?: string
+          membership_status?: string
+          organization_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_organization_memberships_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "collab_organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_organizations: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          organization_type: string
+          summary: string
+          updated_at: string
+          verification_status: string
+          website: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          organization_type: string
+          summary?: string
+          updated_at?: string
+          verification_status?: string
+          website?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          organization_type?: string
+          summary?: string
+          updated_at?: string
+          verification_status?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
+      collab_outcomes: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          evaluation: string
+          final_deliverable_url: string | null
+          handover_summary: string
+          id: string
+          implementation_responsibility: string
+          pilot_result: string
+          recorded_by: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          evaluation?: string
+          final_deliverable_url?: string | null
+          handover_summary: string
+          id?: string
+          implementation_responsibility?: string
+          pilot_result?: string
+          recorded_by: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          evaluation?: string
+          final_deliverable_url?: string | null
+          handover_summary?: string
+          id?: string
+          implementation_responsibility?: string
+          pilot_result?: string
+          recorded_by?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_outcomes_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: true
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_platform_roles: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          platform_role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          platform_role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          platform_role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      collab_problem_contacts: {
+        Row: {
+          contact_preference: string
+          created_at: string
+          owner_id: string
+          problem_id: string
+          relevant_organization: string
+          updated_at: string
+        }
+        Insert: {
+          contact_preference?: string
+          created_at?: string
+          owner_id: string
+          problem_id: string
+          relevant_organization?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_preference?: string
+          created_at?: string
+          owner_id?: string
+          problem_id?: string
+          relevant_organization?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_problem_contacts_problem_id_fkey"
+            columns: ["problem_id"]
+            isOneToOne: true
+            referencedRelation: "collab_problems"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_problems: {
+        Row: {
+          affected_group: string
+          approximate_location: string
+          author_id: string
+          created_at: string
+          current_workaround: string
+          domain: string
+          evidence_path: string | null
+          id: string
+          publication_consent: boolean
+          source_url: string | null
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          affected_group: string
+          approximate_location?: string
+          author_id: string
+          created_at?: string
+          current_workaround?: string
+          domain: string
+          evidence_path?: string | null
+          id?: string
+          publication_consent?: boolean
+          source_url?: string | null
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          affected_group?: string
+          approximate_location?: string
+          author_id?: string
+          created_at?: string
+          current_workaround?: string
+          domain?: string
+          evidence_path?: string | null
+          id?: string
+          publication_consent?: boolean
+          source_url?: string | null
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      collab_profiles: {
+        Row: {
+          availability: string
+          created_at: string
+          discoverable: boolean
+          display_name: string
+          headline: string
+          id: string
+          institution: string
+          onboarding_completed: boolean
+          primary_mode: string
+          skills: string[]
+          updated_at: string
+        }
+        Insert: {
+          availability?: string
+          created_at?: string
+          discoverable?: boolean
+          display_name: string
+          headline?: string
+          id: string
+          institution?: string
+          onboarding_completed?: boolean
+          primary_mode: string
+          skills?: string[]
+          updated_at?: string
+        }
+        Update: {
+          availability?: string
+          created_at?: string
+          discoverable?: boolean
+          display_name?: string
+          headline?: string
+          id?: string
+          institution?: string
+          onboarding_completed?: boolean
+          primary_mode?: string
+          skills?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      collab_reputation_awards: {
+        Row: {
+          awarded_by: string
+          challenge_id: string
+          contribution_id: string
+          created_at: string
+          id: string
+          milestone_id: string
+          points: number
+          reason: string
+          recipient_id: string
+        }
+        Insert: {
+          awarded_by: string
+          challenge_id: string
+          contribution_id: string
+          created_at?: string
+          id?: string
+          milestone_id: string
+          points: number
+          reason: string
+          recipient_id: string
+        }
+        Update: {
+          awarded_by?: string
+          challenge_id?: string
+          contribution_id?: string
+          created_at?: string
+          id?: string
+          milestone_id?: string
+          points?: number
+          reason?: string
+          recipient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_reputation_awards_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_reputation_awards_contribution_id_fkey"
+            columns: ["contribution_id"]
+            isOneToOne: false
+            referencedRelation: "collab_contributions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collab_reputation_awards_milestone_id_fkey"
+            columns: ["milestone_id"]
+            isOneToOne: false
+            referencedRelation: "collab_milestones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collab_team_members: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          member_role: string
+          membership_status: string
+          request_type: string
+          requested_by: string | null
+          responded_at: string | null
+          responded_by: string | null
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          member_role?: string
+          membership_status?: string
+          request_type?: string
+          requested_by?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          member_role?: string
+          membership_status?: string
+          request_type?: string
+          requested_by?: string | null
+          responded_at?: string | null
+          responded_by?: string | null
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_team_members_team_id_challenge_id_fkey"
+            columns: ["team_id", "challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_teams"
+            referencedColumns: ["id", "challenge_id"]
+          },
+        ]
+      }
+      collab_teams: {
+        Row: {
+          challenge_id: string
+          created_at: string
+          id: string
+          leader_id: string
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          challenge_id: string
+          created_at?: string
+          id?: string
+          leader_id: string
+          name: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          challenge_id?: string
+          created_at?: string
+          id?: string
+          leader_id?: string
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collab_teams_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "collab_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence: {
         Row: {
           created_at: string
@@ -537,28 +1294,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      workflow_action: { Args: { p_issue_id: string; p_action: string; p_payload: Json }; Returns: Json }
-      admin_action: { Args: { p_action: string; p_payload: Json }; Returns: Json }
-      import_dataset: { Args: { p_dataset: string; p_source_url: string; p_provenance: string; p_rows: Json }; Returns: Json }
+      collab_command: {
+        Args: { p_command: string; p_payload?: Json }
+        Returns: Json
+      }
+      collab_organization_membership_command: {
+        Args: {
+          p_action: string
+          p_organization_id: string
+          p_role?: string
+          p_user_id?: string
+        }
+        Returns: Json
+      }
+      retrieve_issue_history: { Args: { p_issue_id: string }; Returns: Json }
       route_issue: {
         Args: { p_issue_id: string; p_organization_id: string }
         Returns: string
-      }
-      submit_resolution: {
-        Args: {
-          p_evidence_id: string
-          p_issue_id: string
-          p_mime_type: string
-          p_note: string
-          p_resolution_id: string
-          p_size_bytes: number
-          p_storage_path: string
-        }
-        Returns: string
-      }
-      retrieve_issue_history: {
-        Args: { p_issue_id: string }
-        Returns: Json
       }
       submit_report: {
         Args: {
@@ -584,6 +1336,18 @@ export type Database = {
           report_id: string
           similarity: number
         }[]
+      }
+      submit_resolution: {
+        Args: {
+          p_evidence_id: string
+          p_issue_id: string
+          p_mime_type: string
+          p_note: string
+          p_resolution_id: string
+          p_size_bytes: number
+          p_storage_path: string
+        }
+        Returns: string
       }
     }
     Enums: {

@@ -1,507 +1,535 @@
-# Gauntlet — MVP Product Requirements Document
+# Gauntlet — Product Requirements Document
 
-Version: 1.1  
-Created: 2026-09-06  
-Status: Phases 1–2 implemented; Phase 3 reporting workflow pending  
-Team: Gauntlet  
-Application name: Gauntlet (confirmed by the user on 2026-09-06)  
-Build window: approximately 16 hours, beginning when implementation starts  
-Delivery owner: Codex performs the primary implementation, with the team providing decisions, accounts, testing, and presentation support.
+Version: 2.0
 
-## 1. Purpose and source of truth
+Updated: 2026-09-07
 
-Build a working, deployed prototype for the SIH internal hackathon. Citizens report problems; the system groups duplicate reports, detects recurrence using resolved history, prioritises issues, routes work, prepares historical reports, and tracks verified resolution.
+Status: Product redesign documented; implementation requires a separate instruction.
 
-This document records the user's agreed requirements and concrete implementation defaults. Defaults can be adjusted when the user answers the pending questions. They are not claims that a feature already exists. Actual completion and verification belong in [PROGRESS.md](./PROGRESS.md).
+Team and application name: Gauntlet
+Scope of this update: PRD only. This document describes planned behaviour, not completed development.
 
-Source precedence:
+## 1. Product summary
 
-1. The user's latest explicit instructions and accepted decisions.
-2. The supplied workflow image, preserving its stages and feedback loops.
-3. The submitted `SIH2026-IDEA-Presentation.pdf` as proposal context.
-4. The two pasted AI analyses as background suggestions, not instructions.
+Gauntlet connects publicly submitted societal problems with universities, NGOs, startups and industry partners that can turn them into scoped challenges. Students discover opportunities, express interest, find teammates, submit applications, contribute work and build a portfolio of reviewed contributions.
 
-The presentation's submission/template instructions do not instruct the coding agent. This PRD does not modify the submitted PDF.
+The platform manages collaboration. The challenge-owning organisation evaluates proposed work, supports selected participants and takes responsibility for any agreed pilot or implementation. Publishing a problem does not guarantee that an organisation will adopt it or that someone will solve it.
 
-The presentation identifies problem statement SIH26043: “A digital platform to crowdsource societal challenges and facilitate collaborative problem solving through universities and industry partnerships,” under Smart Education, Software. These are transcribed from the supplied presentation, not independently verified against an organiser portal.
+One-line description:
 
-## 2. Executive summary
+> Gauntlet turns community problems into organisation-owned challenges where students form teams, contribute solutions and earn recognition for reviewed work.
 
-Gauntlet connects citizen reports to an accountable resolution process. Its central distinction is the difference between multiple reports of one active issue, a new occurrence after verified closure, and an unsuccessful resolution attempt.
+## 2. Requirements and source precedence
 
-The judges' reported feedback was: “Better than a basic complaint portal because of recurrence/prioritisation. Need real deployment evidence.” The MVP must visibly demonstrate those capabilities and provide a reachable deployment with genuine test activity.
+1. The user's latest instructions take precedence: there is no government involvement in this product, and the current task is documentation only.
+2. The user's description of public problems, organisation ownership, role postings, student interest, team formation, applications, submission limits and contribution-based profiles defines the new core.
+3. idea.txt supplies supporting concepts. Its government/authority roles, government-funded projects and examples requiring a government operator are excluded.
+4. The original presentation, civic workflow and PRD v1.1 are historical context. They no longer govern the new architecture.
 
-The system uses AI for text/image extraction and evidence-grounded historical summaries. Explicit application rules handle priority and workflow transitions. Officers retain control over ambiguous matches, systemic assessment, escalation, and solver assignment.
+The SIH title supplied by the user is: “A digital platform to crowdsource societal challenges and facilitate collaborative problem solving through universities and industry partnerships.”
 
-There is no AI solver recommendation engine, solver ranking, recommendation confidence percentage, or generated engineering solution in this MVP. Reports are prepared and forwarded to a manually selected recipient. This is the user's explicit interpretation of the solver stage in the supplied workflow.
+This PRD defines the team's chosen product scope; it does not assert that every broader requirement of an official statement has been independently verified or satisfied.
 
-## 3. Objectives and success criteria
+## 3. Problem and value proposition
 
-- A citizen can submit text, a photo, and a location and receive a persistent report ID.
-- A new report can create an issue or join an existing active issue.
-- Matching against verified resolved history can create a linked recurring issue.
-- Priority changes according to documented, bounded rules.
-- A normal issue reaches the appropriate configured department queue.
-- A recurring/systemic issue has a historical report with traceable source records and can be forwarded to a solver.
-- Officers and solvers can record actions and resolution evidence.
-- Citizen/authority verification closes the issue or returns it for rework.
-- History and analytics reflect actual stored records.
-- The application works through its frontend and backend on a public HTTPS deployment.
-- Seeded demonstrations and real pilot activity are clearly distinguished.
+### Community problem contributors
 
-Success is not defined by an invented accuracy percentage, an unverified number of users, government adoption, or production-scale performance.
+People and community organisations can describe a need, supply relevant evidence and make it discoverable. They can follow whether an organisation adopts it and see public project updates.
 
-## 4. Constraints and working approach
+### Students
 
-- Approximately 16 elapsed hours for implementation and validation.
-- Codex is expected to perform nearly all coding; do not plan around three independent full-time developers.
-- Team members assist with UI preferences, accounts, real inputs, validation, and presentation.
-- One application repository, one database project, one runtime AI provider.
-- Implement small complete slices and verify each before proceeding.
-- Build backend foundations first with a thin functional frontend, then improve presentation.
-- Preserve all core workflow branches. Avoid expanding infrastructure to implement optional proposal features.
-- External account provisioning, billing, and unavailable credentials can affect elapsed delivery time; record the actual blocker.
+Students gain access to specific project briefs, potential teammates, declared support, review feedback and a record of their individual contributions. They can choose opportunities appropriate to their skills and availability.
 
-## 5. Scope boundaries
+Points and levels recognise reviewed work; they do not certify professional competence. Academic credit, funding, internships, employment and incubation are conditional benefits that may be advertised only when a partner has explicitly committed to them.
 
-### Required MVP
+### Universities
 
-Citizen submission; image evidence; location; role-based access; extraction; embeddings; active/resolved similarity; duplicate grouping; recurrence links; priority; normal/recurring/systemic assessment; department routing; RAG historical reports; manual challenge forwarding; solver progress; resolution evidence; verification/rework; audit history; basic analytics; deployment; demo validation.
+University coordinators can adopt problems, post opportunities, guide student teams and retain evidence of project activity and reviewed outputs.
 
-### Proposal features represented conservatively
+### NGOs
 
-| Proposal concept | MVP treatment |
-| --- | --- |
-| Solver recommendation | Manual officer selection and report forwarding, per user instruction |
-| Continuous learning | New records and verified outcomes become searchable; no model training |
-| Systemic intelligence | Evidence-backed flags plus officer review; no claimed causal diagnosis |
-| Hotspot intelligence | Location-aware issue list; dedicated hotspot map is optional polish |
-| Related cross-category problems | Officer can note relationships; automated cross-category inference is deferred |
-| Future analytics/forecasting | Actual counts and trends; insufficient-data state for forecasting |
-| Government integration | Configured department queues inside the app; no claim of official API integration |
+NGOs can identify practical needs, specify useful deliverables, provide community access and review outputs. The product should reduce volunteer coordination and handover work rather than create another collection of unsupported ideas.
 
-### Outside this build
+### Startups and industry partners
 
-Custom ML training; local PyTorch/Hugging Face services; FastAPI; FAISS; LangChain; separate vector service; DBSCAN; PostGIS; predictive model training; solver recommendations; incentives/certificates; CSR compliance documents; Aadhaar/OTP integration; external government APIs; automatic email/SMS/WhatsApp delivery; autonomous external outreach; large-scale civic deployment.
+Partners can own challenges or provide explicitly agreed mentorship, resources, evaluation and pilot support. Their involvement must identify a responsible person, a concrete contribution and the scope of that commitment.
 
-These exclusions describe the current implementation scope. Adding them requires a recorded scope decision, not silent omission of an existing required branch.
+These value propositions are hypotheses to validate through conversations with students, a university coordinator and an NGO or industry representative.
 
-### Supported reporting categories
+## 4. Scope and boundaries
 
-The user explicitly expanded reporting beyond four infrastructure categories. Support the following through a configurable category catalogue and the same shared reporting/resolution workflow:
+### In the first MVP
 
-| Category | Example reports | Initial routing treatment |
+- Account registration and profiles.
+- Public societal-problem board with search and domain filters.
+- Organisation onboarding and accountable challenge ownership.
+- Adoption of a problem into a structured challenge.
+- Open role and skill descriptions, scope, support, deliverables and limits.
+- Interested-student pool and opt-in profile discovery.
+- Team creation, invitations and join requests with consent.
+- Individual or team applications, subject to challenge rules.
+- Owner shortlisting, selection, rejection and feedback.
+- Milestone work, individual contribution evidence and revision requests.
+- Accepted contributions, points, levels and public portfolios.
+- Public project status and clearly described outcomes.
+- In-app activity and actionable status updates.
+
+### Excluded from the MVP
+
+- Government accounts, municipal routing, corporator workflows and government approval.
+- A general maintenance complaint-resolution service.
+- Guaranteed repairs, public-service fulfilment or automatic physical implementation.
+- Payments, prize distribution, contracts or recruitment guarantees.
+- Automatic student recommendations, skill-match percentages and AI selection decisions.
+- Automatic GitHub commit attribution or claims that links independently prove authorship.
+- Automatic penalties for rejection, low scores or leaving a project.
+- Private chat, video calls, a social feed and large-scale recommendation infrastructure.
+- Forecasting, live city dashboards and mandatory manual entry of latitude/longitude coordinates.
+- Claims of verified organisations without a real verification process.
+
+Existing government-oriented screens must not simply be relabelled as university screens. Their responsibilities and data flows need redesign before they can support this product.
+
+## 5. Suitable problems
+
+Focus on needs that a participating organisation can scope, support and evaluate. Initial example domains:
+
+- Education and learning access.
+- Community health awareness.
+- Accessibility and inclusion.
+- Livelihoods, employability and skills.
+- Volunteer and community coordination.
+- Digital access and nonprofit operations.
+- Environment and sustainability projects.
+- Other partner-supported societal needs.
+
+Illustrative challenges:
+
+| Community need | Possible challenge | Accountable partner |
 | --- | --- | --- |
-| Roads and footpaths | Potholes, damaged road surfaces or walkways | Configured road-maintenance queue |
-| Drainage and sewage | Waterlogging, blocked drains, sewage overflow | Configured drainage/sanitation queue |
-| Garbage and sanitation | Uncollected waste, dumping | Configured sanitation queue |
-| Street lighting | Broken or nonworking streetlights | Configured streetlight-maintenance queue |
-| Mosquitoes and breeding sites | Mosquito nuisance, reported stagnant-water breeding sites | Configured public-health/vector-control review queue |
-| Noise disturbance | Late-night neighbour noise or loudspeakers | Officer review for locally appropriate routing |
-| Internet and telecom | Internet outages or connectivity complaints | Provider-aware service queue or manual review |
-| Street dogs and animal concerns | Reported chasing, night-time nuisance or injured animals | Configured animal-welfare/municipal review queue |
-| Drinking-water supply and quality | Interrupted supply, suspected contamination or unusual water appearance | Configured water-service review queue |
-| Electricity | Outages, voltage problems, damaged electrical infrastructure | Configured electricity-service review queue |
-| Other neighbourhood issues | Problems not covered by the catalogue | Manual categorisation and routing |
+| An NGO needs more effective drug-awareness outreach | Develop reviewed materials, run an agreed session and evaluate participant learning | NGO and university coordinator |
+| Volunteers struggle to coordinate food pickups | Prototype a scheduling workflow and test it with participating volunteers | Food-support NGO |
+| A learning centre has unreliable connectivity | Build and evaluate an offline learning-content workflow | Learning centre and faculty mentor |
+| An organisation's website is difficult to use with assistive technology | Assess accessibility and implement agreed improvements | Organisation and relevant mentor |
 
-These are configurable prototype queues, not verified jurisdiction assignments or live integrations. Private internet-provider complaints must not automatically be labelled government responsibility. Retain service provider and locality when supplied; an unknown recipient stays in officer review.
+These are examples, not evidence that the team has researched or partnered with these organisations. A campaign's completion must not be described as the eradication of a social problem.
 
-Citizens can choose a category or describe an issue for classification. Preserve the citizen's selection and allow officer correction. Apply the existing matching, priority, RAG, assignment, and verification features to every category without building separate applications.
+## 6. Roles and permissions
 
-Category/location alone must not merge distinct neighbours, households, service providers, assets, or incidents. Use relevant incident time and optional provider/asset context. Store missing context as unknown; uncertain matches require review. A mosquito report does not establish a medical diagnosis, and a photo does not certify water quality. Retain these as reported concerns and factual observations.
-
-Evidence should suit the report: photos are optional when they cannot meaningfully demonstrate an issue, such as intermittent internet or late-night noise. Text and location remain required; occurrence time, duration, and provider can supply useful context. The text-only processing path still supports classification and embeddings. Photo upload remains fully supported for relevant reports and resolution evidence.
-
-## 6. Users and permissions
-
-| Role | Allowed work |
-| --- | --- |
-| Citizen | Submit reports; view their reports and associated issue status; provide eligible verification |
-| Officer/admin | Review issues within configured scope; correct classification/matches; route, escalate and assign; record department actions; review rejected solutions |
-| Solver | View assigned challenges and their reports; acknowledge assignment; add progress and resolution evidence |
-
-For the prototype, one officer/admin role can cover the pilot's departments. The UI must still show the assigned department or solver. Privileged roles are assigned by trusted administration, never by a public signup dropdown or user-editable profile metadata.
-
-Verification default: the initiating citizen is the designated verifier. If unavailable, an authorised officer may verify with an explicit reason and actor label. Other supporting reporters can add evidence but do not independently race to close the issue. This is an MVP default pending team feedback.
-
-## 7. Final technology stack
-
-| Part | Choice | Responsibility |
+| Role | Responsibilities | Boundaries |
 | --- | --- | --- |
-| Frontend and backend | Next.js + TypeScript | React screens and server Route Handlers |
-| Styling | Tailwind CSS | Simple responsive UI |
-| Persistent data | Supabase PostgreSQL | Reports, issues, history, assignments, verification |
-| Authentication | Supabase Auth | Sessions and login |
-| Photos | Supabase Storage | Private report and resolution evidence |
-| Text/image analysis | OpenAI `gpt-5.6-luna` | Validated extraction and historical summaries |
-| Embeddings | OpenAI `text-embedding-3-small` | Semantic representation of report text and image observations |
-| Similarity | Supabase pgvector | Ranked semantic candidates |
-| Geography | Simple coordinate distance checks | Candidate relevance without an added geographic extension |
-| Priority and routing | TypeScript rules | Deterministic application behaviour |
-| RAG | Database retrieval + direct AI call | Grounded historical report generation |
-| Analytics | SQL aggregates and simple UI components | Counts, trends, resolution metrics |
-| Deployment | Vercel + Supabase Cloud | Hosted application and persistent services |
+| Visitor | Browse public problems, challenges and opted-in portfolios | Cannot apply, invite, submit or review |
+| Community contributor | Publish a problem and follow public outcomes | Cannot assign student teams or award points |
+| Student | Express interest, discover peers, join/form teams, apply and submit individual work | Cannot accept their own work or change challenge rules |
+| Organisation representative | Represent a university, NGO, startup or industry organisation; own challenges and review work | May manage only authorised organisation challenges |
+| Team leader | Invite members and submit the team's application | Cannot add people without consent or award points |
+| Automated trust and safety controls | Verify organisation claims, detect duplicate problems and abuse/collusion, and apply defined system actions | No routine human moderation or unilateral human administrator decisions |
 
-Use the Supabase JavaScript client and direct OpenAI SDK calls. A small validation library may be introduced if it reduces implementation risk; it is not a separate architecture layer. Pin actual compatible package versions and commit the lockfile during scaffolding.
+A user may be a problem contributor and a student. Organisation membership is a separately authorised relationship, not a browser-supplied role.
 
-No API/model access has been tested for this project yet. Verify access with a small real request before coupling the application to it. Keep model IDs configurable server-side. Model changes must preserve or regenerate compatible embeddings; do not compare vectors from different embedding models.
+MVP default: one responsible coordinator per organisation, one primary owner per challenge and one selected team per challenge. Additional partner support can be recorded by the owner. Multi-coordinator administration and multiple selected teams can be expanded later.
 
-## 8. Architecture
+Organisation claims receive an automated trust tier at signup: verified, unverified or flagged. Routine verification and moderation do not wait for human review. Reviewed work means reviewed by the named challenge owner; it must not imply independent professional certification.
 
-```text
-Citizen / Officer / Solver browser
-                |
-        Next.js application
-        UI + authenticated APIs
-          /             \
- Supabase                OpenAI
- Auth / PostgreSQL       Extraction
- pgvector / Storage      Embeddings / historical summary
-```
+## 7. End-to-end workflow
 
-The database is the source of truth. The browser does not decide priority, role access, issue linkage, or verification transitions. Photos use authenticated upload permissions and short-lived access when needed. OpenAI credentials and Supabase privileged keys stay server-side.
+1. A user registers; full profile details are not required at signup.
+2. A contributor publishes a problem with its context, required location path and optional evidence.
+3. An organisation reviews the need and decides whether it can support a project.
+4. The organisation adopts the problem and publishes a structured challenge.
+5. Students read the brief, roles, support and restrictions.
+6. Students express interest and opt into the interested-person directory.
+7. Students form a team through accepted invitations or join requests.
+8. An individual or team submits an application before the deadline.
+9. The owner shortlists, selects or rejects applications with feedback.
+10. The selected team works through agreed milestones.
+11. Each contributor submits their own work description and evidence.
+12. The owner accepts a contribution or requests revision.
+13. Accepted contributions create one-time reputation awards.
+14. The owner records the final deliverable and any demonstrated pilot outcome.
+15. The public challenge and student portfolios show the recorded result.
 
-The processing path is save-first: preserve the report and its evidence before AI work. Use a bounded, awaited processing request with stored processing state. Do not rely on untracked work continuing after a serverless response. A failed request leaves a retryable record; retry must not create duplicate issues or events.
+No step assumes that an idea, proposal or prototype has already solved the original societal problem.
 
-## 9. Complete workflow
+## 8. Problem submission and public discovery
 
-### Stage 1: Citizen report
+Required fields:
 
-Input: description, optional photo, latitude/longitude or manually selected coordinates, and location label. Accept optional occurrence time, duration, and provider/asset context. Attach authenticated reporter ID and server timestamps. Record occurrence time when supplied, otherwise use submission time and label that default.
+- Title.
+- Description of the affected group and observed need.
+- Current workaround and why improvement is needed.
+- Domain.
+- Permission to publish the submitted text and evidence.
+- Location, captured through one required path: the browser/device Geolocation API or a manual area/city selection.
 
-Validate text, file type/size, and coordinates. Denied geolocation must have a manual location fallback. Provide clear submission, upload, processing, and retry states.
+Optional fields:
+- Supporting source/document URL.
+- Photo in JPG, PNG or WebP format.
+- Relevant organisation or contact preference, kept separate from public data.
 
-### Stage 2: NLP and multimodal processing
+On submission, request the current location through the browser/device Geolocation API once. The user never manually enters latitude/longitude. The platform reverse-geocodes captured coordinates and displays only the resulting locality or area name. If permission is denied, the user must choose an area/city from the manual dropdown; this is a required fallback, not an optional field. Store the locality name as public data and captured raw coordinates as internal-only matching and deduplication data. Do not display raw coordinates publicly.
 
-Analyse the user's text and photo. Produce a constrained category, short title, factual summary, visible observations, and severity. Preserve the original text and photo. AI cannot claim hidden causes from an image. Missing or conflicting evidence goes to review.
+Do not publish phone numbers, private contact details or identifiable sensitive information by default.
 
-Officers can correct extracted fields. Save the original output, correction, actor, and extraction version needed for debugging.
+An unadopted entry is labelled community-reported, not verified. It remains visible as awaiting an organisation. Adoption creates a linked challenge without deleting or rewriting the original report.
 
-### Stage 3: Sentence embedding
+If a published problem remains unadopted for the configured threshold of X days, label it visibly: “Awaiting organisation — no adoption yet after [X] days.” The original submitter can see the count of organisations that viewed the problem, but not their identities or reasons for passing.
 
-Generate an embedding from original report text plus factual extracted observations and category. Keep coordinates as explicit geographic inputs. Store model ID, dimensions, and input/version metadata. Initially use 1536 dimensions consistently for `text-embedding-3-small` and verify the response dimension.
+## 9. Challenge ownership and publishing
 
-### Stage 4: Initial similarity search
+An organisation representative’s first “Adopt this problem” action is gated by the same one-time profile-completion step: domain of interest, organisation and location. These values are stored permanently on the profile and are not requested again for later adoption actions. Browsing/exploring problems and challenges remains fully accessible without this gate.
 
-Search both active issues and verified resolved history. Use semantic similarity only after checking category and geographic relevance. Include occurrence/submission timing to distinguish late reports from post-resolution recurrence.
+An owner must define:
 
-For small pilot data, SQL can prefilter a geographic bounding box and return candidate coordinates for exact distance checks; ensure nearby candidates are not lost by globally limiting semantic results first. Use Haversine distance in metres. Do not introduce PostGIS for this MVP.
+- Responsible organisation and coordinator.
+- Link to the original problem.
+- Reviewed problem context and objective.
+- Expected roles and useful skills.
+- Deliverables and evaluation criteria.
+- Constraints: time, resources, access, budget and permitted activities.
+- Confirmed support: mentor, feedback, materials, access or funding, where agreed.
+- Participation type: volunteering, academic project, research, sponsored project or other clearly described arrangement.
+- Minimum and maximum team size.
+- Maximum interested students and maximum applications.
+- Deadline with an explicit timezone.
+- Milestones and intended handover or pilot arrangements.
+- For a university-owned challenge, an eligible-students scope: own institution only (the default), own institution plus named partner institutions, or open to all.
 
-Exact match thresholds and category radii are calibration parameters, not scientific constants. Test them against labelled examples before enabling automatic linkage. Dense neighbouring assets such as streetlights need tighter matching than broad waterlogging areas. Unclear matches go to officer review.
+Role postings describe required contributions, such as design, research, facilitation or development. They are not job offers unless an authorised organisation explicitly publishes one.
 
-### Stage 5A: Active match
+The owner must not use reputation as an automatic substitute for reviewing the proposal and relevant evidence. New students start with no history and should still be eligible by default.
 
-Attach the report to the same active issue. Keep every citizen report and photo separately. Recompute unique reporter count and priority. A duplicate report is not another recurrence. Repeat requests with the same idempotency key return the existing result.
+Evaluation criteria must be size-agnostic. When a challenge permits a solo applicant, owners must not apply an explicit or implicit preference for larger teams. A strong solo submission is evaluated against the same proposed approach, experience, feasibility and deliverable-quality criteria as a team submission, not against team size.
 
-### Stage 5B: Resolved match
+Once a milestone contribution is submitted, the responsible coordinator must accept it or request revision within the configured review-response window of 7–14 days. On a missed window, the system sends an automated reminder; on a second missed window, it marks the challenge “Stalled” publicly and applies an organisation demerit. Accumulated demerits lower the organisation’s trust tier and may restrict new challenge publishing until resolved. After the final configured stall threshold, the system may assign a recorded secondary coordinator or reopen the underlying problem for adoption by another organisation. This does not delete or invalidate the original team’s submitted/reviewed contributions or awarded points.
 
-Retrieve the earlier verified resolution, evidence, location, and timestamps. A plausible later occurrence creates a new issue instance linked to its predecessor and recurrence family. The earlier resolved record stays intact.
+## 10. Interest and teammate discovery
 
-If an active occurrence already exists for that family, attach the report there instead. A similarity match alone does not establish that an earlier fix failed or why a problem returned. Officer review handles ambiguous timing or location.
+- “I'm interested” expresses interest; it is not an application or selection.
+- A student’s first “I'm interested” action is gated by a one-time profile-completion step requiring domain of interest, college and location. The completed details are stored permanently on the profile and are not requested again for later interest actions.
+- Browsing or exploring problems and challenges never triggers profile completion; only the first interest action does.
+- Students must consent to showing their display name, skills and opted-in profile to potential teammates.
+- Interested people can inspect each other's self-described skills and availability.
+- No private email or phone number is exposed through the directory.
+- One interest record per student per challenge.
+- Repeated clicks do not create duplicates or points.
+- The UI clearly distinguishes interested, invited, team member, applied and selected.
+- Private or inactive profiles must not remain discoverable after opting out, except for records necessary to an existing team's workflow.
 
-### Stage 5C: No match
+An interest-capacity limit must be enforced by the backend, including simultaneous requests.
 
-Create a new issue with its initial report. No historical match does not prevent officer assessment as systemic.
+## 11. Team formation
 
-### Stage 6: Classification and data assessment
+- A student creates a team for one challenge and becomes its leader.
+- The leader can invite interested students.
+- Interested students can request to join a team.
+- Invitations require student acceptance; join requests require leader acceptance.
+- Pending invitations do not count as accepted members.
+- Team capacity is checked when a request is accepted.
+- A student may belong to only one active application team for the same challenge.
+- Students may join teams for different challenges.
+- The roster is frozen at application submission to prevent changing the reviewed team.
+- Before submission, nonleaders can leave and leaders can manage pending requests.
+- Post-selection changes require an explicit owner-reviewed amendment; they do not retroactively grant credit.
+- For university-owned challenges, enforce the eligible-students scope using the student profile’s college at both invitation/join-request acceptance and application submission. Reject ineligible invitations, join requests and applications with a clear reason.
 
-Separate creation/match outcome from issue classification:
+MVP default: individual applications are represented as one-person teams and are allowed only when the challenge minimum team size is one.
 
-- Match outcome: new issue, active match, resolved match, or review pending.
-- Classification: normal, recurring, or systemic.
-- Recurrence count: linked prior verified occurrences, not report volume.
-- Failure count: rejected resolution attempts, not separate occurrences.
+## 12. Applications and owner evaluation
 
-Record assessment evidence and officer overrides. Recurring issues enter the escalation review branch. Systemic classification can be confirmed by an officer based on scope, repeated failures, or cross-department complexity; automatic text interpretation is not proof of systemic cause.
+Applications contain:
 
-### Stage 7A: Normal issue routing
+- Team and accepted member list.
+- Proposed approach.
+- Relevant experience or portfolio evidence.
+- Planned responsibilities.
+- Feasibility and constraints.
+- A repository, document, prototype or presentation link where appropriate.
 
-Category maps to a configured department within the pilot. Unmapped categories go to officer review. The department queue shows report details and priority. The officer records progress, then submits a resolution note and evidence for verification.
+Planned defaults:
 
-Acceptance closes the issue as verified. Rejection records the reason, increments failed attempts, and returns the same issue to department rework. History remains available throughout.
+- One application per team per challenge.
+- The same person cannot appear in multiple simultaneous applications for one challenge.
+- Owner-configured application capacity and deadline enforced in the database.
+- An application revision does not create another slot or reputation award.
+- Original applicants and review history remain auditable.
+- Private proposals are visible only to the applicant team and authorised reviewers.
+- Owners can shortlist, reject or select with recorded feedback.
+- One team is selected per challenge in the initial MVP.
 
-### Stage 7B: Recurring/systemic routing
+Before an owner sees an application, a rule-based compliance filter automatically rejects incomplete submissions, submissions below the challenge minimum team size, and submissions past the deadline. This is eligibility enforcement, not a quality judgment.
 
-Retrieve relevant past issues and their actions; generate a factual historical report; show assessment to the officer; create an escalation; let the officer choose a solver from a small configured directory; forward the report through an in-app assignment.
+For the remaining eligible pool, the review order is assistive only: reserve a configured fixed share for high-reputation teams and a configured fixed share for zero-history teams, then cap and pre-sort the shortlist-review order. The owner still manually reviews and selects from that list, preserving eligibility for new students.
 
-The solver receives access in their dashboard, acknowledges the assignment, records updates, and submits implementation evidence. This is application delivery, not automatic communication to real institutions outside the app.
+The platform may rank problems for browsing organisations by domain/skill fit and rank candidate applications for an owner shortlist by skill overlap. These rankings are sort orders only: they never automatically select, reject, or assign a percentage suitability score. The human owner retains full decision authority.
 
-Citizen/authority acceptance closes the issue. Rejection moves it to manual officer/expert review. The officer records a modified approach or assigns another solver, and implementation resumes on the same issue. A solver cannot verify their own work.
+No numerical suitability percentages, automated selection or guaranteed selection are required.
 
-### Stage 8: Issue history stored
+## 13. Project milestones and individual contributions
 
-Write reports, embeddings, assignments, actions, evidence references, verification outcomes, recurrence links, and failure data as events occur. Store UTC timestamps and actor IDs. Do not wait until closure to save history.
+Suggested adaptable milestones:
 
-### Stage 9: Future reports and analytics
+1. Problem understanding and research.
+2. Proposed intervention, design or prototype.
+3. Testing, activity delivery or pilot.
+4. Final handover and evaluation.
 
-Show actual issue/report totals, active/verified counts, recurring issues, category totals, rejected attempts, and resolution duration where data exists. Label sample records and prevent seeded activity from being counted as real pilot evidence. Forecasting shows an insufficient-history state; do not fabricate predictions.
+A campaign can use planning/materials/session/evaluation labels; a software challenge can use research/prototype/testing/handover labels.
 
-### Stage 10: Similarity recheck
+Each individual contribution records:
 
-New reports search the updated active and resolved corpus. Permit an officer-triggered recheck after corrections when useful. Existing report identity and processed version prevent rechecks from creating duplicate recurrence events. A recheck does not silently change verified history.
+- Contributor and team.
+- Challenge and milestone.
+- What that person completed.
+- Evidence link or permitted attachment.
+- Submission timestamp.
+- Review status, reviewer, feedback and decision timestamp.
 
-## 10. RAG and historical report specification
+The team leader cannot claim identical credit for every member. Review is recorded for each person's work.
 
-RAG means retrieval-augmented generation: retrieve stored evidence, then generate a summary grounded in that evidence.
+A reviewer may accept or request revision. Accepted records are immutable in the normal workflow. Corrections require an audited administrative process. A rejected or revised draft does not automatically penalise reputation.
 
-1. Start with the current issue and its known recurrence family.
-2. Retrieve directly linked previous occurrences first.
-3. Retrieve a few relevant historical examples by semantic/category relevance if useful.
-4. Fetch the actual resolution actions, dates, evidence, and verification outcomes for those issue IDs.
-5. Provide these records to the model with a strict factual reporting instruction.
-6. Validate the output and source IDs before saving the report version.
+## 14. Reputation, levels and portfolios
 
-Direct recurrence history and analogous cases from elsewhere must be labelled separately. An analogous case is not counted as a local recurrence.
+Reputation recognises reviewed contributions, not self-reported activity.
 
-Required report sections:
+Proposed MVP scoring, to be confirmed before implementation:
 
-- Current issue, location, category, report count, and priority.
-- Supporting evidence and observation dates.
-- Previous linked incidents and their verified closure dates.
-- Previous interventions and recorded outcomes.
-- Rejected attempts and stated rejection reasons.
-- Factual recurrence/failure summary.
-- Missing information and unresolved questions.
-- Source issue/action links.
-- Prepared time and generation version.
-- Assigned department/solver and forwarding status once assigned.
+| Event | Points |
+| --- | ---: |
+| Express interest, join a team or submit an application | 0 |
+| Accepted research contribution | 25 |
+| Accepted prototype/design/activity-preparation contribution | 25 |
+| Accepted testing/pilot/evaluation contribution | 25 |
+| Accepted final handover contribution | 100 |
 
-Do not include solver rankings, confidence percentages, invented causal explanations, or recommended engineering solutions. Every historical factual assertion must be traceable to retrieved records. If retrieval is empty, say no relevant history was found. If generation fails, show a structured factual history view marked summary unavailable; do not label it successful AI generation.
+One award is permitted per person, challenge and milestone. Retrying a review, uploading another version or refreshing a page must not award points again.
 
-## 11. Priority calculation
+Proposed level rule: level = 1 + floor(total accepted points / 100).
 
-Initial proposed heuristic, subject to calibration:
+Profiles show:
 
-```text
-priority = round(
-  40 * severity
-  + 25 * min(unique_reporters / 10, 1)
-  + 20 * min(prior_verified_occurrences / 3, 1)
-  + 15 * min(days_open / 7, 1)
-)
-```
+- Display name, affiliation, skills and availability.
+- Points and level.
+- Participation and accepted contribution history.
+- Named challenge and reviewing organisation.
+- Evidence links and review feedback intended for publication.
+- Separately recorded project completion and pilot outcomes.
 
-Severity normalisation: low = 0.25, medium = 0.50, high = 0.75, critical = 1.00. Inputs must be nonnegative; output is bounded to 0–100. Repeated submissions by one person do not increase unique-reporting weight. Age is computed from the current occurrence, not its oldest historical predecessor.
+Skills are self-described unless assessed through a separate process. Points do not measure employability, societal impact or professional competence. No automatic negative points, peer voting or minimum-reputation barrier is included in the MVP.
 
-Example: high severity, six unique reporters, two previous verified occurrences, and two days open gives approximately 63/100.
+Prevent self-review and disclose the limits of owner verification. Fake organisations and collusive awards require platform moderation; a points formula alone cannot prevent them.
 
-Recompute after relevant changes and when presenting the active queue so age does not stay stale. Stable tie-break: oldest issue first. Show the score and factual contributing values; it is a work priority score, not model confidence. Critical severity gets a visible badge independently of the aggregate score.
+## 15. Completion and implementation responsibility
 
-## 12. Data model
+Keep these states distinct:
 
-Concrete schema may be simplified during implementation while preserving these relationships and auditability.
-
-| Entity | Essential fields and relationships |
+| Result | What can be claimed |
 | --- | --- |
-| profiles | Auth user ID, display name, trusted role, organisation membership |
-| organisations | Name, type: department/university/industry/NGO/expert, active flag |
-| issues | ID, title, category, severity, classification, lifecycle status, coordinates, location label, creator, designated verifier, department, recurrence family, predecessor, created/verified timestamps, priority |
-| reports | ID, issue ID (nullable while processing), reporter, original description, occurrence time, coordinates, processing status/error, embedding/model/dimensions, extraction output, idempotency key, demo flag |
-| issue_events | Issue, event type, actor, event time, factual payload; preserves assignment, assessment, progress and correction history |
-| evidence | Report/issue/resolution-event reference, private storage path, uploader, MIME type, size, timestamp |
-| assignments | Issue, recipient organisation, assigned actor, current status, assigned/acknowledged times; previous assignments retained |
-| resolution_attempts | Issue, submitting actor, note, evidence references, pending/accepted/rejected outcome, designated verifier, decision time and rejection reason |
-| historical_reports | Issue, retrieved source IDs, structured summary, generation status, generated time, model and version |
+| Proposal accepted | Owner selected an approach/team |
+| Deliverable accepted | Owner reviewed and accepted the submitted output |
+| Pilot conducted | A documented trial occurred |
+| Outcome measured | A specific result was observed using a stated method |
+| Adopted/implemented | A named organisation took responsibility for use or operation |
 
-An issue is an occurrence. A report is one person's submission. A recurrence family connects successive occurrences. A resolution attempt is work proposed for verification. These must not be conflated.
+Final closure records the deliverable, evidence, evaluation, remaining limitations and implementation owner where applicable.
 
-Use foreign keys, enum/check constraints, and uniqueness for request idempotency. Perform final match/link and transition writes atomically. Recheck for an active matching occurrence inside a transaction or equivalent database lock to avoid two simultaneous reports creating duplicate parent issues.
+For example, an awareness project may report sessions delivered and pre/post learning feedback. It must not claim reduced drug use without suitable evidence.
 
-## 13. State machines
+## 16. State models
 
-Processing: `pending -> processing -> processed`, or `processing -> failed -> processing` on explicit retry. Use a stored attempt/version to recover stale processing states.
+Problem:
+Published → Awaiting organisation → Awaiting organisation — no adoption yet after [X] days → Adopted into challenge.
 
-Normal lifecycle:
+Challenge:
+Open for interest/applications → Team selected → In progress → Stalled (when review SLA escalation applies) → Final deliverable accepted → Closed with recorded outcome.
 
-```text
-open -> assigned -> in_progress -> awaiting_verification -> verified
-                                      |
-                                      +-> rework_required -> in_progress
-```
+Membership:
+Invited or join requested → Accepted or declined.
 
-Escalated lifecycle:
+Application:
+Submitted → Shortlisted → Selected or rejected.
 
-```text
-escalation_review -> escalated -> assigned -> in_progress
-                                                |
-                                     awaiting_verification -> verified
-                                                |
-                                          manual_review
-                                                |
-                                reassigned or modified approach
-                                                |
-                                           in_progress
-```
+Contribution:
+Submitted → Accepted or revision requested → Resubmitted.
 
-Status transitions require an authenticated permitted actor and valid current state. Concurrent stale updates return a conflict and refresh the UI. An issue awaiting verification remains active for duplicate detection. Only accepted verification creates resolved history for recurrence checks. Rejection preserves its attempt and evidence.
+All transitions enforce actor permissions, deadlines, capacity and current state on the server. Simultaneous acceptance, team joins and reputation awards must produce consistent results.
 
-## 14. Screens and first impression
+## 17. Technical architecture
 
-Use a consistent, simple responsive design: clear typography, restrained colours, visible status badges, usable forms, and a readable issue timeline. Prioritise the main task on each page. Include loading, empty, failure, and retry states.
+Keep the existing lightweight web stack.
 
-| Screen | Required content/actions |
-| --- | --- |
-| Entry/login | App/team identity, login, clear navigation to role workspace |
-| Citizen report | Description, photo, location capture/manual fallback, submit state |
-| Citizen reports | Report IDs, linked issue status, view details |
-| Officer dashboard | Active/recurring/verified totals, priority queue, category/status filters |
-| Issue details | Evidence, supporting reports, history, priority factors, authorised actions |
-| Historical report | Grounded summary, source links, missing-data state, forwarding control |
-| Solver dashboard | Assigned challenges, acknowledgement, progress, evidence submission |
-| Verification | Resolution attempt and before/after evidence, accept/reject with reason |
-
-An issue detail page is the demonstration's centre: current report -> previous fix -> recurrence -> forwarded report -> implementation -> verification.
-
-## 15. Backend API responsibilities
-
-Proposed routes may change during scaffolding; responsibilities must remain consistent.
-
-| Endpoint | Responsibility |
-| --- | --- |
-| POST /api/reports | Validate and persist a report with an idempotency key |
-| POST /api/reports/:id/process | Authorised bounded extraction/embedding/match attempt or retry |
-| GET /api/reports | Current citizen's reports |
-| GET /api/issues | Role-scoped filtered queue |
-| GET /api/issues/:id | Authorised issue, history and evidence access |
-| PATCH /api/issues/:id | Officer correction/assessment with audit event |
-| POST /api/issues/:id/assign | Department or solver assignment |
-| POST /api/issues/:id/escalate | Officer escalation decision |
-| POST /api/issues/:id/history-report | Retrieve evidence and generate/store historical report |
-| POST /api/issues/:id/progress | Authorised progress update |
-| POST /api/issues/:id/resolutions | Create pending resolution attempt |
-| POST /api/resolutions/:id/verify | Accept/reject by eligible verifier |
-| GET /api/analytics | Role-scoped aggregates |
-
-Return structured validation errors, forbidden responses, missing-record responses, and transition conflicts. Never trust actor IDs, roles, computed priority, or verification eligibility sent by the browser.
-
-## 16. Security and reliability requirements
-
-- Enable appropriate row-level access policies on exposed tables and storage.
-- Citizens access their submissions and permitted issue views; solvers access assigned work; officers access their configured scope.
-- Server endpoints enforce permissions even if the UI hides controls.
-- Keep privileged Supabase keys and OpenAI keys out of browser bundles, source control, logs, and documents.
-- Use private evidence storage and authorised, expiring URLs.
-- Limit image formats and sizes; initial target is JPEG/PNG/WebP up to 5 MB, validated at upload.
-- Validate coordinates, input lengths, API payloads, and model output shape.
-- Treat complaint text, uploaded content, and retrieved history as untrusted data, never as instructions to the model or server.
-- Validate generated citation IDs against the retrieved set.
-- Preserve reports when AI or upload follow-up fails; provide a recoverable state.
-- Make retries and verification submissions idempotent.
-- Add basic per-user submission/processing limits to protect API quota.
-- Record useful failure stages and request IDs without leaking sensitive content or credentials.
-
-Suggested environment names: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `OPENAI_API_KEY`, `OPENAI_ANALYSIS_MODEL`, `OPENAI_EMBEDDING_MODEL`, and `APP_URL`. Add a privileged Supabase secret only if required server-side. `.env.example` contains placeholders; actual secrets remain in ignored environment files or hosting settings.
-
-## 17. Sixteen-hour implementation phases
-
-Estimates assume account access is available. Record actual timing in PROGRESS.md. The documentation preparation is complete before implementation timing begins; do not pretend a timer has already started.
-
-| Phase | Elapsed target | Deliverable / exit check |
+| Layer | Planned technology | Responsibility |
 | --- | --- | --- |
-| P0: Foundation | 0–1 h | Scaffold, dependency lockfile, environment checks, account/API smoke test, deployment configuration |
-| P1: Data and access | 1–3 h | Schema, access policies, storage, role accounts, report persistence |
-| P2: Functional reporting slice | 3–5 h | Citizen photo/text/location submission visible in officer dashboard |
-| P3: Core intelligence | 5–8 h | Extraction, embeddings, duplicates, recurrence, bounded priority verified against examples |
-| P4: Normal lifecycle | 8–10 h | Department routing, resolution evidence, acceptance, rejection and rework |
-| P5: Escalation and RAG | 10–12 h | Grounded historical report, manual forwarding, solver progress, rejection/manual review loop |
-| P6: Presentation quality | 12–13 h | Simple analytics, clear timeline, mobile/error states, coherent visual styling |
-| P7: Deployment evidence | 13–16 h | Hosted end-to-end checks, actual pilot activity where available, defect fixes and demo capture |
+| Web UI | Next.js, React, TypeScript | Public discovery, profiles, teams and owner workspaces |
+| Styling | Tailwind CSS and existing design system | Responsive forms, cards, status and portfolios |
+| Backend | Next.js Route Handlers / server components | Session validation, input validation and workflow requests |
+| Database | Supabase PostgreSQL | Relationships, constraints, transactions and audit records |
+| Authentication | Supabase Auth | User accounts and sessions |
+| Evidence | Private Supabase Storage | Authorised uploads and expiring evidence links |
+| Access control | RLS and narrow authorised database functions | Ownership, memberships and private applications |
+| Hosting | Vercel | User-managed deployment after implementation and testing |
 
-Prepare hosting early and aim to test the first usable slice online; do not leave environment discovery to the final hour. Core lifecycle correctness takes priority over additional charts or decoration. No required workflow branch is silently dropped if time becomes tight; report incomplete work explicitly.
+Planned request path:
 
-## 18. Acceptance tests and demo scenarios
+Browser → Next.js authentication/validation → authorised database transaction → stored event/contribution → refreshed workspace.
 
-All tests below begin as NOT RUN. Use actual results in PROGRESS.md. Test significant logic with focused automated tests and validate complete flows through the deployed UI.
+Public discovery returns only intentionally public fields. Private proposals and draft evidence require membership or owner access. Reputation is calculated from an append-only award ledger; it is never accepted from browser input.
 
-| ID | Scenario | Expected result |
-| --- | --- | --- |
-| A01 | Citizen submits valid text/photo/location | Persistent report ID, retained evidence, visible processing state |
-| A02 | No prior match | One new issue linked to the report |
-| A03 | Second citizen reports same active problem | Same issue, two reports, correct unique count and priority |
-| A04 | Similar description at a distant location | Separate issue; no false local recurrence |
-| A05 | Later occurrence after verified closure | New issue linked to earlier occurrence; old record unchanged |
-| A06 | More reports on that active recurrence | Join current issue; recurrence count does not increase |
-| A07 | Late report describes pre-resolution occurrence | No automatic claim of new recurrence; review or correct linkage |
-| A08 | Normal issue resolution accepted | Status verified, decision actor/time/evidence retained |
-| A09 | Normal resolution rejected | Same issue returns for rework, failed attempt retained |
-| A10 | Recurring/systemic escalation | Historical report generated and officer-selected solver receives in-app assignment |
-| A11 | Solver resolution rejected | Manual review, reassignment/modified approach, implementation resumes |
-| A12 | RAG with existing history | Factual summary with valid source links and no invented solutions |
-| A13 | RAG with empty history or API failure | Honest missing-history/unavailable-summary state |
-| A14 | Wrong role attempts privileged operation | Backend/database denies access |
-| A15 | Denied geolocation or invalid upload | Clear validation/manual fallback; no lost valid inputs |
-| A16 | AI timeout and retry | Report retained; retry processes once without duplicate issue/event |
-| A17 | Concurrent duplicates or repeated verification | Consistent atomic results; no double counting or double closure |
-| A18 | Analytics after lifecycle changes | Counts match database; demo and real records identified |
-| A19 | Public deployment on another device | Login, upload, processing, routing and verification work over HTTPS |
-| A20 | Report each expanded category, including Other | Saved category, appropriate configured queue or explicit manual review; no forced government routing for private-provider issues |
-| A21 | Noise/internet report without a photo | Valid text/location submission processes successfully; optional time/provider context retained |
-| A22 | Similar nearby complaints about different providers/assets or incidents | Remain separate or require review; proximity alone does not force a merge |
+AI is not used for team formation, selection or reputation decisions. The platform uses similarity embeddings and historical-database search for automated duplicate/similar-problem detection; submissions above a configured threshold are auto-linked or auto-merged instead of creating duplicate listings. Geolocation capture, reverse geocoding and internal coordinate matching support required location handling. No paid API access is needed for the basic collaboration workflow.
 
-Maintain a small labelled matching set containing positive duplicates, true later recurrences, unrelated descriptions, distant similar issues, and neighbouring distinct assets. Record observed errors and calibrate thresholds; do not claim accuracy from a single rehearsed example.
+## 18. Planned data model
 
-## 19. Deployment and pilot evidence
-
-Deployment target: Next.js on Vercel connected to the configured Supabase project. Validate environment variables, auth redirect URLs, storage access, and server AI requests on the deployed environment.
-
-Collect the actual reachable URL, commit/deployment identifier, check time, tested device/browser, and pass/fail result. A local server does not satisfy online deployment evidence.
-
-For a small pilot, the team can recruit consenting campus testers, collect actual reports, and record real application actions. Label any simulated officer/solver account and any staged repair. Do not present an application click as a real physical repair or institutional partnership.
-
-Historical recurrence seed data is acceptable for a clearly labelled demonstration. Keep synthetic historical dates and seed identifiers distinct from real pilot data. Do not fabricate months of usage, government participation, resolution impact, or prediction accuracy.
-
-Record a short demo showing submission, active duplicate grouping, verified-history recurrence, historical report forwarding, and verification/rework. The presentation team updates claims to match the working implementation.
-
-## 20. Risks and recovery
-
-| Risk | Response |
+| Entity | Purpose and important relationships |
 | --- | --- |
-| Missing account/API credit | Identify during P0; continue independent local work and record the blocker |
-| Incorrect semantic match | Location/category gates, labelled calibration, officer review/correction |
-| AI generation fails | Retain original report and factual history; expose explicit retry/unavailable state |
-| No real historical data | Label seeded scenarios; avoid false pilot/forecasting claims |
-| Scope exceeds available time | Protect both lifecycle branches; defer optional polish and disclose unfinished features |
-| Lost evidence or inconsistent counters | Persist first; use transactional linkage and auditable records |
-| UI looks unfinished | Use one visual system, prioritise dashboard and issue detail, verify mobile states |
+| User profile | Auth identity, public display fields, affiliation/college, domain of interest, location, skills and discovery consent |
+| Organisation | Type, name, website/domain, automated trust tier, demerit count and responsible/secondary coordinator |
+| Organisation membership | Authorised users and ownership/reviewer permissions |
+| Problem | Original author, public context, domain, public locality name, internal raw coordinates, view count, similarity links and evidence |
+| Challenge | Problem, owning organisation, requirements, support, deadline, limits, institution-eligibility scope, named partner institutions, review-SLA timestamps and stall state |
+| Interest | Unique student/challenge relationship |
+| Team | Challenge, leader and team name |
+| Team membership | Invitation/request/acceptance state and consent |
+| Application | Team, private proposal, submission state and review |
+| Milestone | Challenge/project stage and expected deliverable |
+| Contribution | Individual work, milestone, evidence and owner review |
+| Reputation award | Unique reviewed contribution and points |
+| Outcome | Final handover, pilot evidence, evaluation and implementation responsibility |
+| Activity/notification | Relevant transitions, recipients and timestamps |
+| Trust and safety event | Automated verification checks, reports, abuse/collusion anomalies, system actions and rare-dispute fallback records |
 
-## 21. Pending questions and implementation defaults
+Database invariants include unique interests, controlled active team membership, valid min/max sizes, institution-scope eligibility, deadline enforcement, fixed submitted rosters and one award per accepted contribution.
 
-Questions sent to the user on 2026-09-06:
+## 19. Screens and navigation
 
-1. Application name: answered. Use Gauntlet for the app and team.
-2. Categories: expanded by the user to neighbourhood concerns including mosquitoes, noise, internet, street dogs, drinking water and electricity, as specified in section 5. Pilot area remains unconfirmed. Hyderabad for real pilot activity and Ranchi for labelled sample scenarios were suggested, not accepted decisions.
-3. Service availability: user supplied the separate `Gauntlet_SIH` Supabase project at `https://riewkdcmcwqtimrgvity.supabase.co`. Management access confirms ACTIVE_HEALTHY in Singapore. The older inactive project is not selected or modified. Vercel CLI access was tested and the token is invalid; reauthentication is needed. OpenAI API access/budget remains pending. API usage is billed separately from ChatGPT subscriptions. No purchase is authorised by this document.
+- Home: explain the problem-to-team concept and participant benefits.
+- Explore: public problems and organisation-owned challenges with search/filtering.
+- Submit problem: understandable context, required location through geolocation or manual area/city fallback, and optional evidence; no manual coordinate entry.
+- Challenge detail: owner, brief, roles, constraints, support, deadlines and limits.
+- Interested people: opted-in students and their relevant profile details.
+- Team workspace: roster, invitations, join requests and application.
+- Organisation workspace: adopted problems, challenge publishing, applications and review.
+- Project workspace: selected team, milestones, contribution evidence and revision feedback.
+- My profile/public portfolio: accepted work, points, level and discovery controls.
+- Activity: invitations, application decisions and reviews requiring action.
+- Trust and safety: automated organisation verification, duplicate detection, abuse/collusion controls and structured rare-dispute fallback, separate from challenge ownership.
 
-4. External dataset: the user will supply it later, near the end of the build. This does not block scaffolding or core implementation. Inspect its fields, provenance, licensing and suitability on arrival; preserve original source IDs and separate imports from live and explicitly synthetic records. Do not promise recurrence history that the eventual dataset does not contain.
+Empty states must explain the next meaningful step. Avoid fictional counts, partners, profiles or completed projects in the live interface.
 
-Gauntlet is the confirmed application title. Use the expanded category catalogue in section 5. Do not invent a campus location or real institutional partnership. Credentials must be configured securely, not pasted into this document or the progress log.
+## 20. Security, trust and operational limits
 
-Additional assumptions to revisit during implementation: designated initiating-citizen verification; one officer/admin scope for the pilot; a small manually configured solver directory; in-app forwarding only; English initial UI.
+- Derive identity and ownership from the authenticated session and stored membership.
+- Do not trust client-supplied roles, reviewer IDs, points or organisation ownership.
+- Keep private application and pending contribution data out of public responses.
+- Require consent for public profiles and team membership.
+- Restrict image formats and file size; proposed upload maximum is 4 MB.
+- Keep storage private and issue authorised expiring links.
+- Enforce request limits and database uniqueness, not just disabled buttons.
+- Use transactions for selection, capacity checks and awards.
+- Do not award points to an owner reviewing their own contribution.
+- At signup, automatically cross-check organisation email domains against registered website domains (including WHOIS), registration numbers against applicable public NGO/business/tax registries, and require institutional email domains for universities. Assign verified, unverified or flagged trust tiers without a manual review step.
+- Embed each new problem and search historical submissions for similarity. Auto-link or auto-merge submissions above the configured threshold instead of making duplicate public listings.
+- Auto-hide reported content when its report count reaches the configured threshold. Run anomaly detection on the reputation-award ledger to flag statistically unusual patterns, including small closed groups repeatedly awarding one another, in addition to the database-level self-review block.
+- For rare high-severity disputes, including contested organisation legitimacy, use a structured non-human fallback: rules-based escalation or a vote among high-reputation users, rather than a single human administrator.
+- Maintain a review audit trail and distinguish automated trust tiers from owner review of work.
+- Preserve existing data during migration; do not assume historic civic records are valid challenges.
+- Avoid showing legacy government roles or repair-resolution claims in the redesigned UI.
 
-## 22. Definition of done
+## 21. Implementation phases
 
-- Required workflow stages and both feedback loops implemented.
-- Acceptance checks executed with recorded outcomes and unresolved defects disclosed.
-- Role restrictions and evidence access verified.
-- Real extraction and embedding requests demonstrated with configured runtime credentials.
-- Historical summaries traceable to stored records.
-- App deployed and core flow tested on another device.
-- Seed/pilot provenance clearly labelled.
-- PRD reflects final scope and PROGRESS.md reflects actual state.
-- User receives deployment details, implemented capabilities, and remaining limitations.
+These are new phases for the redesigned product. They are all planned. Previous civic-phase completion does not mean these features are implemented.
 
-## 23. Change and progress maintenance contract
+| Phase | Deliverable | Exit check |
+| --- | --- | --- |
+| 1 — Foundation and migration design | Map reusable code, define new entities/access rules, redesign navigation and onboarding | Schema and role design reviewed; old data preserved |
+| 2 — Problem discovery and ownership | Public submissions, evidence, organisation onboarding and challenge publishing | A member posts a problem and an organisation adopts it with a complete brief |
+| 3 — Student profiles and interest | Skills, discovery consent, interest directory and profile access | Students can opt in, express interest once and inspect permitted peers |
+| 4 — Teams and applications | Invitations, join requests, solo/team applications, limits and deadline enforcement | Consenting members form a valid team and submit once |
+| 5 — Selection and project work | Owner feedback, selected team, milestones, contributions and revisions | Owner can select a team and review individual work |
+| 6 — Reputation and presentation | Award ledger, levels, portfolios, activity states and responsive UI | Accepted work awards points once and appears correctly on profiles |
+| 7 — Automated trust controls and deployment | Automated verification, duplicate/abuse controls, realistic test accounts, scenario checks, fixes and manual Vercel deployment | Full collaboration journey and automated control paths demonstrated; evidence recorded |
 
-After EVERY project change, update PROGRESS.md in the same work batch before reporting completion or moving to another task. This includes code, schema, configuration, dependencies, documents, seed data, and deployment changes. A coherent patch may be one entry, but its changed files and purpose must be explicit. Also log material test results, failures, blockers, and recoveries.
+No new 16-hour promise is made. Re-estimate after inspecting implementation reuse and agreeing the first demo scenario.
 
-Use sequential change IDs. Do not mark work complete without the appropriate evidence. Keep historical entries; correct prior mistakes with a new entry. Update this PRD when scope or behaviour changes. This contract requires active maintenance by the implementing agent; a Markdown file does not automatically observe changes.
+## 22. Manual acceptance scenarios
 
-## 24. Technical references
+All redesigned-workflow scenarios are NOT RUN.
 
-These references supported the stack discussion. Consult current documentation again when implementing concrete APIs; account availability is not established by documentation alone.
+| ID | Scenario | Expected outcome |
+| --- | --- | --- |
+| N01 | Public problem submission | Discoverable problem with explicit publication consent |
+| N02 | Organisation adopts a problem | Linked challenge with accountable owner and complete requirements |
+| N03 | Unauthorised user changes another owner's challenge | Denied by backend/database |
+| N04 | Student expresses interest twice | One interest and zero reputation awards |
+| N05 | Profile not opted into discovery | Not exposed in teammate search |
+| N06 | Invitation and join request | Membership added only after the correct person's acceptance |
+| N07 | Last team place requested simultaneously | Maximum team size remains enforced |
+| N08 | Student tries to join two application teams for one challenge | Conflict prevented |
+| N09 | Deadline or application limit reached | New submission rejected with a clear reason |
+| N10 | Solo applicant below minimum team size | Rejected without creating a valid application |
+| N11 | Other team accesses a private proposal | Access denied |
+| N12 | Owner selects a team | Selection recorded and project work opened to the selected members |
+| N13 | Member submits individual evidence | Attribution remains with that member |
+| N14 | Owner requests revision | Feedback retained; no points awarded |
+| N15 | Accepted contribution reviewed again | No duplicate points |
+| N16 | Student or owner attempts self-award | Denied |
+| N17 | Public portfolio | Only permitted reviewed contributions and truthful totals shown |
+| N18 | Final handover recorded | Deliverable acceptance distinguished from demonstrated impact |
+| N19 | Public deployed journey | Registration through accepted contribution works over HTTPS |
+| N20 | Location permission denied | Required manual area/city fallback is enforced; only locality name is public |
+| N21 | First interest action | One-time profile completion is required; Explore remains accessible without it |
+| N22 | University eligibility scope | Ineligible invite, join request and application are rejected with a clear reason |
+| N23 | Review SLA missed twice | Reminder is sent, challenge becomes publicly Stalled and organisation receives a demerit |
+| N24 | Duplicate or abusive submission | System auto-links/merges a high-similarity problem or auto-hides content after the report threshold |
 
-- [Next.js Route Handlers](https://nextjs.org/docs/app/getting-started/route-handlers)
-- [Supabase vector columns](https://supabase.com/docs/guides/ai/vector-columns)
-- [OpenAI GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)
-- [OpenAI text-embedding-3-small](https://developers.openai.com/api/docs/models/text-embedding-3-small)
-- [Next.js deployment on Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs)
+## 23. Demo and research requirements
+
+A complaint dataset and map are not prerequisites for this MVP. The central demonstration requires linked collaboration records:
+
+- One documented societal need.
+- One organisation willing to define and review a project, or clearly labelled simulated accounts.
+- A scoped challenge with roles, support, deliverables and limits.
+- Two or more students for team formation.
+- An application, review, contribution and accepted-work example.
+
+Synthetic records are acceptable for demonstrating mechanics if labelled. They do not prove partner participation, successful implementation or student demand.
+
+Before making research claims, collect direct feedback from a problem owner, an organisation coordinator and potential student participants. Record willingness to participate, constraints, expected benefits and who will actually review the work.
+
+Local startup and deployment instructions will be revised alongside implementation, not claimed complete through this PRD update.
+
+## 24. Decisions and open implementation choices
+
+Confirmed:
+
+- No government involvement.
+- Publicly submitted societal problems.
+- Universities/NGOs and other nongovernment organisations can own challenges.
+- Roles and participation limits are defined for each challenge.
+- Students express interest, discover peers, form teams and apply.
+- Individual reviewed contributions support profile progression.
+- Location is mandatory through geolocation or a manual area/city fallback; public locality and internal raw coordinates are separated.
+- Full profile completion is deferred until the first student interest action or organisation adoption action; browsing remains ungated.
+- Evaluation is size-agnostic where solo participation is permitted.
+- Organisation verification, duplicate detection, abuse/collusion controls and routine moderation are automated, with structured non-human high-severity dispute fallback.
+- Unadopted problems receive a visible awaiting-organisation SLA label and private aggregate organisation-view count for the submitter.
+- Challenge review-response SLAs, public Stalled status, organisation demerits and eventual coordinator reassignment/reopening are defined.
+- Ranking is assistive sort order only; human owners retain selection decisions.
+- Rule-based eligibility filtering and reputation-weighted review ordering preserve manual quality review and zero-history eligibility.
+- University challenges have enforced institution-scoped student eligibility.
+- Current task changes only this PRD.
+
+Proposed MVP defaults requiring confirmation before implementation if material:
+
+- One selected team per challenge.
+- Individual applications represented by one-person teams.
+- One responsible organisation coordinator initially.
+- Points of 25/25/25/100 and 100-point level increments.
+- No minimum reputation requirement for new participants.
+- No automatic penalties for student rejection, low scores or leaving a project, and no algorithmic selection.
+- Exact automated verification sources, similarity/report/anomaly thresholds, review-response windows, stall thresholds and review-order shares.
+
+## 25. Definition of done
+
+The redesign is complete only when the new workflow works end to end, access/capacity/award checks pass, participant-visible copy matches this scope, and deployment evidence exists.
+
+Updating this PRD does not complete any implementation phase. PROGRESS.md should be updated when implementation is separately authorised and completed in meaningful batches, following the user's preference against constant documentation churn.

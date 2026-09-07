@@ -6,8 +6,6 @@
     "node": "24.x"
   },
   "scripts": {
-    "test:history": "node --experimental-strip-types --test scripts/test-history.mjs scripts/test-history-runtime.mjs",
-    "test:phase6": "node --experimental-strip-types --test scripts/test-analytics.mjs",
     "dev": "next dev --hostname 127.0.0.1",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
