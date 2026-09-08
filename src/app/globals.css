@@ -424,3 +424,81 @@ footer { max-width: 1200px; margin: auto; border-top: 1px solid var(--line); pad
   .form-footer, .workspace-hero, .workspace-empty { align-items: flex-start; flex-direction: column; }
   .workspace-hero { min-height: 0; }
 }
+
+.profile-banner {
+  padding: 16px 20px;
+  background: #f4ecce;
+  border: 1px solid #d9c87a;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  font-size: 14px;
+  margin: 24px 0;
+}
+
+/* ── Signup account type picker ── */
+.account-type-picker { min-width: 0; margin: 0 0 8px; padding: 0; border: 0; }
+.account-type-picker legend { color: #29463d; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.account-type-picker > div { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.account-type-picker label { position: relative; min-height: 110px; display: grid; align-content: start; padding: 15px; border: 1px solid var(--line); border-radius: 10px; background: #fafbf7; cursor: pointer; transition: border-color .15s, background .15s; }
+.account-type-picker label:hover { border-color: #9bb89a; }
+.account-type-picker label.selected { border-color: #56806b; background: #edf3e9; box-shadow: inset 0 0 0 1px #56806b; }
+.account-type-picker input[type="radio"] { width: 16px; height: 16px; margin: 0 0 10px; accent-color: var(--green); }
+.account-type-picker strong { font-size: 14px; display: block; margin-bottom: 5px; }
+.account-type-picker span { color: var(--muted); font-size: 11px; font-weight: 400; line-height: 1.5; }
+.email-restriction { color: #9b6a2f; font-size: 11px; font-weight: 400; margin-top: 2px; }
+.confirm-password-error { color: #9b392c; font-size: 11px; margin-top: -8px; }
+
+/* ── Profile completion banner ── */
+.profile-banner { padding: 16px 20px; background: #f4ecce; border: 1px solid #d9c87a; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; gap: 20px; font-size: 14px; margin: 24px 0; }
+.profile-banner p { margin: 0; color: #5a4c1f; }
+.profile-banner .button-primary { flex: 0 0 auto; font-size: 12px; padding: 10px 16px; }
+
+/* ── Domain interests checkboxes ── */
+.domain-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.domain-grid label { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; background: #fafbf7; cursor: pointer; font-size: 13px; font-weight: 400; transition: background .15s; }
+.domain-grid label:hover { background: #edf3e9; }
+.domain-grid label.checked { background: #e4edde; border-color: #8baa7e; }
+.domain-grid input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--green); margin: 0; }
+
+/* ── Workspace role sections ── */
+.workspace-section { padding: 32px 0 0; }
+.workspace-section-heading { margin: 0 0 16px; }
+.workspace-section-heading .eyebrow { margin-bottom: 6px; }
+.workspace-section-heading h2 { margin: 0; font-size: 24px; font-weight: 500; letter-spacing: -.6px; }
+.workspace-action-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 20px; padding: 26px; border: 1px solid var(--line); border-radius: 12px; background: #fff; box-shadow: 0 12px 35px -30px #173d31; margin-bottom: 14px; }
+.workspace-action-card h3 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+.workspace-action-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+/* ── Admin panel ── */
+.admin-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 28px 0; }
+.admin-stat { padding: 18px; background: #fff; border: 1px solid var(--line); border-radius: 10px; }
+.admin-stat:first-child { background: var(--green); color: #fff; border-color: var(--green); }
+.admin-stat strong { display: block; font-size: 28px; font-weight: 500; letter-spacing: -1px; }
+.admin-stat span { font-size: 12px; color: var(--muted); }
+.admin-stat:first-child span { color: #c8dfd3; }
+.admin-section { margin-top: 36px; }
+.admin-section h2 { font-size: 22px; font-weight: 500; letter-spacing: -.5px; margin: 0 0 16px; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 12px 0 18px; font-size: 12px; color: var(--muted); }
+.map-legend-item { display: flex; align-items: center; gap: 6px; }
+.map-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* ── Onboarding textarea ── */
+.onboarding-form textarea { width: 100%; min-height: 90px; border: 1px solid #cbd6c7; border-radius: 8px; padding: 12px 13px; background: #fff; color: var(--foreground); font: inherit; font-size: 14px; resize: vertical; }
+.onboarding-form textarea:focus { border-color: #51816b; outline: 3px solid #51816b22; }
+
+/* ── Responsive for new components ── */
+@media (max-width: 900px) {
+  .account-type-picker > div { grid-template-columns: 1fr; }
+  .account-type-picker label { min-height: 0; }
+  .domain-grid { grid-template-columns: 1fr; }
+  .admin-stats { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 640px) {
+  .admin-stats { grid-template-columns: 1fr 1fr; }
+  .workspace-action-card { grid-template-columns: 1fr; gap: 14px; }
+  .profile-banner { flex-direction: column; align-items: flex-start; }
+}
+

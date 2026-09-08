@@ -2,20 +2,39 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { availabilityOptions, primaryModes } from "../constants";
 import type { CollaborationProfile, PrimaryMode } from "../types";
 
 type OnboardingFormProps = {
   email: string;
   existingProfile: CollaborationProfile | null;
   suggestedName: string;
+  accountType: string;
 };
 
-export function OnboardingForm({ email, existingProfile, suggestedName }: OnboardingFormProps) {
+const domainOptions = [
+  "Technology",
+  "Healthcare",
+  "Education",
+  "Environment",
+  "Agriculture",
+  "Accessibility",
+  "Livelihoods",
+  "Community Services",
+  "Digital Access",
+  "Other"
+];
+
+const orgTypeOptions = [
+  "University",
+  "NGO",
+  "Startup",
+  "Industry Partner",
+  "Expert Group",
+  "Service Provider"
+];
+
+export function OnboardingForm({ email, existingProfile, suggestedName, accountType }: OnboardingFormProps) {
   const router = useRouter();
-  const [mode, setMode] = useState<PrimaryMode>(
-    (existingProfile?.primary_mode as PrimaryMode | undefined) ?? "student",
-  );
   const [message, setMessage] = useState("");
   const [pending, setPending] = useState(false);
 
@@ -25,16 +44,47 @@ export function OnboardingForm({ email, existingProfile, suggestedName }: Onboar
     setMessage("");
 
     const form = new FormData(event.currentTarget);
-    const payload = {
-      displayName: String(form.get("displayName") ?? ""),
-      primaryMode: mode,
-      headline: String(form.get("headline") ?? ""),
-      institution: String(form.get("institution") ?? ""),
-      skills: String(form.get("skills") ?? "")
+    
+    let finalInstitution = "";
+    let finalHeadline = "";
+    let finalSkills: string[] = [];
+    let finalMode: PrimaryMode = "student";
+
+    if (accountType === "community_member") {
+      finalMode = "community_contributor";
+    } else if (accountType === "student") {
+      finalMode = "student";
+      const college = String(form.get("college") ?? "");
+      const degree = String(form.get("degree") ?? "");
+      finalInstitution = degree ? `${college}, ${degree}` : college;
+      finalHeadline = String(form.get("headline") ?? "");
+      
+      const domains = form.getAll("domains").map(String);
+      const skillsInput = String(form.get("skills") ?? "")
         .split(",")
         .map((skill) => skill.trim())
-        .filter(Boolean),
-      availability: String(form.get("availability") ?? "open"),
+        .filter(Boolean);
+      
+      finalSkills = Array.from(new Set([...domains, ...skillsInput]));
+    } else if (accountType === "organization_representative") {
+      finalMode = "organization_representative";
+      const orgName = String(form.get("orgName") ?? "");
+      const designation = String(form.get("designation") ?? "");
+      finalInstitution = designation ? `${orgName} - ${designation}` : orgName;
+      
+      const focus = String(form.get("focus") ?? "");
+      const website = String(form.get("website") ?? "");
+      const orgType = String(form.get("orgType") ?? "");
+      finalHeadline = [orgType, focus, website].filter(Boolean).join(" | ");
+    }
+
+    const payload = {
+      displayName: String(form.get("displayName") ?? ""),
+      primaryMode: finalMode,
+      headline: finalHeadline,
+      institution: finalInstitution,
+      skills: finalSkills,
+      availability: "open", // Simplified, as it wasn't requested for new forms
       discoverable: form.get("discoverable") === "on",
     };
 
@@ -43,6 +93,7 @@ export function OnboardingForm({ email, existingProfile, suggestedName }: Onboar
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+    
     const result = (await response.json()) as { error?: string };
 
     if (!response.ok) {
@@ -55,6 +106,118 @@ export function OnboardingForm({ email, existingProfile, suggestedName }: Onboar
     router.refresh();
   }
 
+  if (accountType === "community_member") {
+    return (
+      <form className="onboarding-form" onSubmit={submit}>
+        <div className="field-row">
+          <label>
+            Display name
+            <input
+              name="displayName"
+              defaultValue={existingProfile?.display_name ?? suggestedName}
+              minLength={2}
+              maxLength={100}
+              autoComplete="name"
+              required
+            />
+          </label>
+          <label>
+            Account email
+            <input value={email} disabled aria-describedby="email-note" />
+            <small id="email-note">Your email stays private.</small>
+          </label>
+        </div>
+        <div className="form-footer">
+          <button className="button-primary" type="submit" disabled={pending}>
+            {pending ? "Saving…" : "Continue to workspace"}
+            <span aria-hidden="true">→</span>
+          </button>
+          <p className="form-message" role="status">{message}</p>
+        </div>
+      </form>
+    );
+  }
+
+  if (accountType === "organization_representative") {
+    return (
+      <form className="onboarding-form" onSubmit={submit}>
+        <div className="field-row">
+          <label>
+            Representative name
+            <input
+              name="displayName"
+              defaultValue={existingProfile?.display_name ?? suggestedName}
+              minLength={2}
+              maxLength={100}
+              autoComplete="name"
+              required
+            />
+          </label>
+          <label>
+            Account email
+            <input value={email} disabled aria-describedby="email-note" />
+            <small id="email-note">Your email stays private.</small>
+          </label>
+        </div>
+
+        <div className="field-row">
+          <label>
+            Organisation name
+            <input name="orgName" required />
+          </label>
+          <label>
+            Organisation type
+            <select name="orgType">
+              {orgTypeOptions.map(o => (
+                <option key={o} value={o}>{o}</option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="field-row">
+          <label>
+            Contact person designation
+            <input name="designation" placeholder="e.g. Director, HR" />
+          </label>
+          <label>
+            Website URL (optional)
+            <input name="website" type="url" placeholder="https://" />
+          </label>
+        </div>
+
+        <label>
+          Area of focus / description
+          <textarea
+            name="focus"
+            rows={3}
+            maxLength={300}
+            style={{ width: '100%', padding: '12px', border: '1px solid #cbd6c7', borderRadius: '8px', marginTop: '4px' }}
+            placeholder="Describe your organisation's focus..."
+          />
+        </label>
+
+        <label className="consent-row">
+          <input
+            type="checkbox"
+            name="discoverable"
+            defaultChecked={existingProfile?.discoverable ?? true}
+          />
+          <span>Allow my display name, introduction, affiliation and skills to appear in public discovery.</span>
+        </label>
+
+        <div className="form-footer">
+          <button className="button-primary" type="submit" disabled={pending}>
+            {pending ? "Saving…" : existingProfile ? "Save profile" : "Create my workspace"}
+            <span aria-hidden="true">→</span>
+          </button>
+          <p className="form-message" role="status">{message}</p>
+        </div>
+      </form>
+    );
+  }
+
+  // Default to student
   return (
     <form className="onboarding-form" onSubmit={submit}>
       <div className="field-row">
@@ -76,65 +239,48 @@ export function OnboardingForm({ email, existingProfile, suggestedName }: Onboar
         </label>
       </div>
 
-      <fieldset className="mode-picker">
-        <legend>How do you want to begin?</legend>
-        <p>You can still submit problems in any mode. Organisation permissions require an approved membership.</p>
-        <div>
-          {primaryModes.map((option) => (
-            <label key={option.value} className={mode === option.value ? "selected" : ""}>
-              <input
-                type="radio"
-                name="primaryMode"
-                value={option.value}
-                checked={mode === option.value}
-                onChange={() => setMode(option.value)}
-              />
-              <strong>{option.label}</strong>
-              <span>{option.description}</span>
+      <div className="field-row">
+        <label>
+          College/University name
+          <input name="college" required />
+        </label>
+        <label>
+          Degree & Year
+          <input name="degree" placeholder="e.g. B.Tech CSE, 3rd Year" />
+        </label>
+      </div>
+
+      <fieldset style={{ border: 'none', padding: 0, margin: '16px 0' }}>
+        <legend style={{ fontWeight: 'bold', marginBottom: '8px' }}>Domain interests</legend>
+        <div className="domain-grid">
+          {domainOptions.map(d => (
+            <label key={d}>
+              <input type="checkbox" name="domains" value={d} />
+              {d}
             </label>
           ))}
         </div>
       </fieldset>
 
-      <div className="field-row">
-        <label>
-          Institution or affiliation
-          <input
-            name="institution"
-            defaultValue={existingProfile?.institution ?? ""}
-            maxLength={160}
-            placeholder="University, NGO, community group…"
-          />
-        </label>
-        <label>
-          Availability
-          <select name="availability" defaultValue={existingProfile?.availability ?? "open"}>
-            {availabilityOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-        </label>
-      </div>
+      <label>
+        Skills
+        <input
+          name="skills"
+          defaultValue={existingProfile?.skills?.join(", ") ?? ""}
+          maxLength={1000}
+          placeholder="Research, design, React, outreach"
+        />
+        <small>Separate skills with commas. Add up to 20.</small>
+      </label>
 
       <label>
-        Short introduction
+        Short bio / headline
         <input
           name="headline"
           defaultValue={existingProfile?.headline ?? ""}
           maxLength={160}
           placeholder="What do you care about or contribute?"
         />
-      </label>
-
-      <label>
-        Skills
-        <input
-          name="skills"
-          defaultValue={existingProfile?.skills.join(", ") ?? ""}
-          maxLength={1000}
-          placeholder="Research, design, React, outreach"
-        />
-        <small>Separate skills with commas. Add up to 20.</small>
       </label>
 
       <label className="consent-row">
@@ -156,4 +302,3 @@ export function OnboardingForm({ email, existingProfile, suggestedName }: Onboar
     </form>
   );
 }
-

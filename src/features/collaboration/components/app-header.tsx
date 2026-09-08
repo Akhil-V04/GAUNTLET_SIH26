@@ -3,9 +3,10 @@ import { collaborationSignOut } from "../server/actions";
 
 type AppHeaderProps = {
   displayName?: string;
+  isAdmin?: boolean;
 };
 
-export function AppHeader({ displayName }: AppHeaderProps) {
+export function AppHeader({ displayName, isAdmin }: AppHeaderProps) {
   return (
     <header className="collab-header">
       <Link href="/" className="brand" aria-label="Gauntlet home">
@@ -15,6 +16,7 @@ export function AppHeader({ displayName }: AppHeaderProps) {
       <nav aria-label="Workspace navigation" className="collab-nav">
         <Link href="/workspace">Workspace</Link>
         <Link href="/onboarding">Profile</Link>
+        {isAdmin && <Link href="/admin">Admin</Link>}
       </nav>
       <div className="collab-account">
         {displayName && <span>{displayName}</span>}
