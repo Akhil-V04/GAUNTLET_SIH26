@@ -229,11 +229,11 @@ export function PostProblemForm() {
                         } else {
                           setApproximateLocation(`${latitude}, ${longitude}`);
                         }
-                      } catch (error) {
+                      } catch {
                         setApproximateLocation(`${latitude}, ${longitude}`);
                       }
                     },
-                    (error) => {
+                    () => {
                       setError("Unable to retrieve your location.");
                     }
                   );

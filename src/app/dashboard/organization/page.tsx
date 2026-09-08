@@ -128,7 +128,10 @@ export default async function OrganizationDashboardPage() {
                       year: "numeric",
                     })}
                   </span>
-                  <Link href={`/problems/${problem.id}`}>View details →</Link>
+                  <div style={{ marginLeft: "auto", display: "flex", gap: "12px", alignItems: "center" }}>
+                    <Link href={`/problems/${problem.id}`} style={{ fontWeight: "normal", color: "var(--muted)" }}>View details</Link>
+                    <Link href={`/challenges/new?problem_id=${problem.id}`} className="button-primary" style={{ padding: "8px 12px", fontSize: "12px" }}>Take up problem</Link>
+                  </div>
                 </div>
               </article>
             ))}

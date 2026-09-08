@@ -6,8 +6,13 @@ const clean = (value: unknown, maximum: number) =>
 
 export async function PUT(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
-    return Response.json({ error: "Cross-site requests are not allowed." }, { status: 403 });
+  const requestOrigin = new URL(request.url).origin;
+  if (origin && origin !== requestOrigin) {
+    const isLocalhost = origin.includes("localhost") || origin.includes("127.0.0.1");
+    const isRequestLocalhost = requestOrigin.includes("localhost") || requestOrigin.includes("127.0.0.1");
+    if (!(isLocalhost && isRequestLocalhost)) {
+      return Response.json({ error: "Cross-site requests are not allowed." }, { status: 403 });
+    }
   }
 
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
