@@ -25,7 +25,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
   const { data: latest, error: latestError } = await db.from("historical_reports").select("*").eq("issue_id", id).order("version", { ascending: false }).limit(1).maybeSingle();
   if (latestError) return reply({ error: "Could not read saved report versions." }, 500);
   const previous = readHistoryDocument(latest?.summary);
-  if (previous?.fingerprint === historyFingerprint(snapshot) && (latest?.generation_status === "generated" || !process.env.OPENAI_API_KEY?.trim())) {
+  if (previous?.fingerprint === historyFingerprint(snapshot) && (latest?.generation_status === "generated" || !process.env.GROQ_API_KEY?.trim())) {
     return reply({ id: latest!.id, status: latest!.generation_status, version: latest!.version, reused: true });
   }
   // A brief cooldown prevents repeated paid generation from accidental clicks.

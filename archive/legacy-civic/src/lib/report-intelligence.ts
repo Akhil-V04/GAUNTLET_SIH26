@@ -75,43 +75,46 @@ function localAnalysis(description: string, selectedCategory: CategoryId): Omit<
 }
 
 async function openAIAnalysis(description: string, selectedCategory: CategoryId, photo?: File) {
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const content: Array<{ type: "input_text"; text: string } | { type: "input_image"; image_url: string; detail: "low" }> = [{
-    type: "input_text",
+  const client = new OpenAI({ 
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: "https://api.groq.com/openai/v1",
+  });
+  
+  // Groq requires standard chat completions format, not the experimental `responses` API or Structured Outputs if it's not fully compatible.
+  // Wait, does Groq support structured outputs exactly like OpenAI? 
+  // Let's use the standard `chat.completions.create` and JSON mode or function calling.
+  // The user specifies using existing openai SDK, and model qwen/qwen3.6-27b.
+  // Wait, `client.responses.create` was an experimental feature in `openai` sdk? No, `responses` might be a new top-level API or legacy. Actually `client.chat.completions.create` is standard. Let's stick to `chat.completions.create` with JSON mode because `qwen/qwen3.6-27b` on Groq supports JSON mode.
+  const content: Array<any> = [{
+    type: "text",
     text: `Analyse this civic complaint. Citizen-selected category: ${selectedCategory}. Complaint: ${description}`,
   }];
   if (photo?.size) {
     const base64 = Buffer.from(await photo.arrayBuffer()).toString("base64");
-    content.push({ type: "input_image", image_url: `data:${photo.type};base64,${base64}`, detail: "low" });
+    content.push({ type: "image_url", image_url: { url: `data:${photo.type};base64,${base64}`, detail: "low" } });
   }
-  const response = await client.responses.create({
-    model: process.env.OPENAI_REPORT_MODEL || "gpt-4.1-mini",
-    instructions: "Extract facts from the citizen report. Do not recommend solutions. Keep the title and summary concise.",
-    input: [{ role: "user", content }],
-    text: { format: { type: "json_schema", name: "civic_report", strict: true, schema: {
-      type: "object", additionalProperties: false,
-      properties: {
-        title: { type: "string" },
-        category: { type: "string", enum: categories.map((item) => item.id) },
-        severity: { type: "string", enum: ["low", "medium", "high", "critical"] },
-        summary: { type: "string" },
-        observations: { type: "array", items: { type: "string" }, maxItems: 4 },
-      },
-      required: ["title", "category", "severity", "summary", "observations"],
-    } } },
+  
+  const response = await client.chat.completions.create({
+    model: process.env.GROQ_REPORT_MODEL || "qwen/qwen3.6-27b",
+    messages: [
+      { role: "system", content: "Extract facts from the citizen report. Do not recommend solutions. Keep the title and summary concise. Return JSON with the exact following keys: title, category, severity, summary, observations (array). Valid categories: " + categories.map((c) => c.id).join(", ") + ". Valid severities: low, medium, high, critical." },
+      { role: "user", content }
+    ],
+    response_format: { type: "json_object" }
   });
-  return JSON.parse(response.output_text) as Omit<ReportAnalysis, "engine" | "embedding" | "embeddingModel">;
+  
+  return JSON.parse(response.choices[0].message.content || "{}") as Omit<ReportAnalysis, "engine" | "embedding" | "embeddingModel">;
 }
 
 export async function analyseReport(description: string, selectedCategory: CategoryId, photo?: File): Promise<ReportAnalysis> {
-  if (process.env.OPENAI_API_KEY?.trim()) {
+  if (process.env.GROQ_API_KEY?.trim() && process.env.OPENAI_API_KEY?.trim()) {
     try {
       const analysis = await openAIAnalysis(description, selectedCategory, photo);
       const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
       const embedding = await client.embeddings.create({ model: "text-embedding-3-small", dimensions: 1536, input: `${analysis.category}\n${analysis.title}\n${analysis.summary}` });
       return { ...analysis, engine: "openai", embedding: embedding.data[0].embedding, embeddingModel: "text-embedding-3-small" };
     } catch (error) {
-      console.error("OpenAI report processing failed; using local fallback", error instanceof Error ? error.message : "unknown error");
+      console.error("Groq/OpenAI report processing failed; using local fallback", error instanceof Error ? error.message : "unknown error");
     }
   }
   const analysis = localAnalysis(description, selectedCategory);
